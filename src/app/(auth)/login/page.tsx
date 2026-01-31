@@ -1,34 +1,36 @@
 "use client"
-import { login } from "@/services/auth.service"
 
 import { AuthLayout, LoginForm } from "@/components/auth"
-import { useState } from "react"
+import { signIn } from "next-auth/react"
+import { useRouter } from "next/navigation"
+import { toast } from "sonner"
+import { addMockUser } from "@/lib/auth/mock-storage"
+import bcrypt from "bcryptjs"
 
 export default function LoginPage() {
-    const [isLoading, setIsLoading] = useState(false)
-  const [error, setError] = useState<string | null>(null)
+  const router = useRouter()
 
   const handleLogin = async (data: { email: string; password: string }) => {
-    setIsLoading(true)
-    setError(null)
-    
     try {
-      const response = await login(data)
-      console.log(response);
-      
-      localStorage.setItem('token', response.token)
-      
-      
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'Login failed')
-    } finally {
-      setIsLoading(false)
+      const result = await signIn('credentials', {
+        email: data.email,
+        password: data.password,
+        redirect: false,
+      })
+
+      if (result?.ok) {
+        router.push('/dashboard')
+      } else {
+        toast.error('Invalid credentials')
+      }
+    } catch (error) {
+      console.error('Login error:', error)
+      toast.error('An error occurred during login')
     }
   }
 
   const handleGoogleLogin = () => {
-    console.log("Google login clicked")
-
+    signIn('google', { callbackUrl: '/dashboard' })
   }
 
   return (
@@ -36,8 +38,6 @@ export default function LoginPage() {
       <LoginForm
         onSubmit={handleLogin}
         onGoogleLogin={handleGoogleLogin}
-        forgotPasswordHref="/forgot-password"
-        signUpHref="/register"
       />
     </AuthLayout>
   )

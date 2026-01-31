@@ -13,16 +13,10 @@ export function AuthLayout({
   showLogo = false,
 }: AuthLayoutProps) {
   return (
-    <div className="flex min-h-screen flex-col bg-background lg:flex-row">
-      <div className="relative hidden flex-1 flex-col p-8 lg:flex">
-        {showLogo && (
-          <div className="absolute left-8 top-8 z-20">
-          </div>
-        )}
-        <div className="flex flex-1 items-center justify-center">
+    <div className="flex max-h-screen flex-col bg-background lg:flex-row">     
+        <div className="flex-1">
           {illustration || <HeroIllustration />}
         </div>
-      </div>
 
       <div className="flex flex-1 flex-col">
         {showLogo && (
